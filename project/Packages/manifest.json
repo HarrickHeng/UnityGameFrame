@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.cysharp.unitask": "file:E:/CodeProject/UniTask/src/UniTask/Assets/Plugins/UniTask",
+    "com.cysharp.unitask": "file:G:/workspace/Unity3d/gamejam2022-6/local_package/com.cysharp.unitask@50a67d8f41",
     "com.unity.2d.animation": "7.0.5",
     "com.unity.2d.pixel-perfect": "5.0.1",
     "com.unity.2d.sprite": "1.0.0",
