@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 /// <summary>
 /// 选择委托：负责 从某个类型中 选取某个字段 返回这个字段的值
@@ -10,7 +8,7 @@ using System.Text;
 /// <typeparam name="T">数据类型： Student</typeparam>
 /// <typeparam name="TKey">数据类型的字段的类型 ：Age int</typeparam>
 /// <param name="t">数据类型的对象： zsObj</param>
-/// <returns>对象的某个字段的值：zsObj.Age  20</returns>                                     
+/// <returns>对象的某个字段的值：zsObj.Age  20</returns>
 public delegate TKey SelectHandler<T, TKey>(T t);
 
 /// <summary>
@@ -24,6 +22,7 @@ public delegate TKey SelectHandler<T, TKey>(T t);
 /// <param name="t"></param>
 /// <returns></returns>
 public delegate bool FindHandler<T>(T t);
+
 public static class ArrayHelper
 {
     /// <summary>
@@ -35,9 +34,8 @@ public static class ArrayHelper
     /// <param name="handler">
     /// 委托对象：负责 从某个类型中选取某个字段 返回这个字段的值
     /// </param>
-    static public void OrderBy<T, TKey>
-        (this T[] array, SelectHandler<T, TKey> handler)
-        where TKey : IComparable<TKey>//对象 非 默认字段 数组比较
+    static public void OrderBy<T, TKey>(this T[] array, SelectHandler<T, TKey> handler)
+        where TKey : IComparable<TKey> //对象 非 默认字段 数组比较
     {
         for (int i = 0; i < array.Length; i++)
         {
@@ -62,8 +60,7 @@ public static class ArrayHelper
     /// <param name="handler">
     /// 委托对象：负责 从某个类型中选取某个字段 返回这个字段的值
     /// </param>
-    static public void OrderByDescending<T, TKey>
-        (this T[] array, SelectHandler<T, TKey> handler)
+    static public void OrderByDescending<T, TKey>(this T[] array, SelectHandler<T, TKey> handler)
         where TKey : IComparable<TKey>
     {
         for (int i = 0; i < array.Length; i++)
@@ -89,8 +86,7 @@ public static class ArrayHelper
     /// <param name="handler">
     /// 委托对象：负责 从某个类型中选取某个字段 返回这个字段的值
     /// </param>
-    static public T Max<T, TKey>
-        (this T[] array, SelectHandler<T, TKey> handler)
+    static public T Max<T, TKey>(this T[] array, SelectHandler<T, TKey> handler)
         where TKey : IComparable<TKey>
     {
         T temp = default(T);
@@ -114,8 +110,7 @@ public static class ArrayHelper
     /// <param name="handler">
     /// 委托对象：负责 从某个类型中选取某个字段 返回这个字段的值
     /// </param>
-    static public T Min<T, TKey>
-        (this T[] array, SelectHandler<T, TKey> handler)
+    static public T Min<T, TKey>(this T[] array, SelectHandler<T, TKey> handler)
         where TKey : IComparable<TKey>
     {
         T temp = default(T);
@@ -188,13 +183,11 @@ public static class ArrayHelper
         return keys;
     }
 
-    static public void ForEach<T>(this T[] array,Action<T> handler)
+    static public void ForEach<T>(this T[] array, Action<T> handler)
     {
         for (int i = 0; i < array.Length; i++)
         {
             handler(array[i]);
         }
     }
-
 }
-

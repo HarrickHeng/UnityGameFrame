@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
+
 /// <summary>
 /// Fmod音效管理器
 /// </summary>
@@ -13,18 +14,13 @@ public class SoundManager
     //音效大小
     public static float Volume_Sound
     {
-        get
-        {
-            return 1;
-        }
+        get { return 1; }
     }
+
     //音乐大小
     public static float Volume_Music
     {
-        get
-        {
-            return 1;
-        }
+        get { return 1; }
     }
 
     static GameObject _root;
@@ -32,10 +28,7 @@ public class SoundManager
 
     public static bool InitOK
     {
-        get
-        {
-            return _root && InitBankLoaded;
-        }
+        get { return _root && InitBankLoaded; }
     }
 
     public static bool InitBankLoaded
@@ -52,16 +45,16 @@ public class SoundManager
         }
     }
 
-    public static Transform Target { get => _target; set => _target = value; }
-
-    private static List<string> BanksKey = new List<string>
+    public static Transform Target
     {
-        "bgm",
-        "bgm.strings",
-        "effect",
-    };
+        get => _target;
+        set => _target = value;
+    }
+
+    private static List<string> BanksKey = new List<string> { "bgm", "bgm.strings", "effect", };
 
     static List<StudioEventEmitter> _3dstudioEventList = new List<StudioEventEmitter>();
+
     //初始化
     public static void Init()
     {
@@ -70,7 +63,7 @@ public class SoundManager
         //加载Bank
         foreach (string b in BanksKey)
         {
-            FMODUnity.RuntimeManager.LoadBank(b, true);
+            RuntimeManager.LoadBank(b, true);
             Debug.Log("Loaded bank " + b);
         }
     }
@@ -81,19 +74,20 @@ public class SoundManager
         {
             _root.transform.position = Target.transform.position + new Vector3(0, 0, 0);
             _root.transform.rotation = Target.transform.rotation;
-            RuntimeManager.SetListenerLocation(_root.transform);//每帧设置收听者的位置
+            RuntimeManager.SetListenerLocation(_root.gameObject); //每帧设置收听者的位置
         }
     }
+
     //所有音乐暂停和恢复(安卓)
     public static void OnAppPause(bool pause)
     {
         RuntimeManager.PauseAllEvents(pause);
         if (pause)
-        {//暂停
+        { //暂停
             RuntimeManager.CoreSystem.mixerSuspend();
         }
         else
-        {//恢复
+        { //恢复
             RuntimeManager.CoreSystem.mixerResume();
         }
     }
@@ -103,11 +97,11 @@ public class SoundManager
     {
         RuntimeManager.PauseAllEvents(!pause);
         if (!pause)
-        {//暂停
+        { //暂停
             RuntimeManager.CoreSystem.mixerSuspend();
         }
         else
-        {//恢复
+        { //恢复
             RuntimeManager.CoreSystem.mixerResume();
         }
     }
@@ -115,15 +109,18 @@ public class SoundManager
     //停止所有音乐
     public static void StopAllSound()
     {
-        if (!_root) return;
+        if (!_root)
+            return;
         var fmodList = _root.GetComponentsInChildren<StudioEventEmitter>();
-        if (fmodList == null) return;
+        if (fmodList == null)
+            return;
         for (int i = 0; i < fmodList.Length; i++)
         {
             fmodList[i].Stop();
             GameObject.Destroy(fmodList[i].gameObject);
         }
     }
+
     //停止指定的音乐
     public static void StopMusic(string eventName)
     {
@@ -135,6 +132,7 @@ public class SoundManager
             UnityEngine.Object.Destroy(studioEvent.gameObject);
         }
     }
+
     //停止当前音乐
     public static string StopCurrentMusic()
     {
@@ -145,6 +143,7 @@ public class SoundManager
     }
 
     private static string _current_music = "";
+
     //播放音乐
     public static void PlayMusic(string eventName)
     {
@@ -159,6 +158,7 @@ public class SoundManager
     {
         _PlaySound(eventName, null);
     }
+
     //播放音效
     public static void PlaySound(string eventName, GameObject voicer)
     {
@@ -171,11 +171,11 @@ public class SoundManager
             return;
         if (voicer)
         {
-            RuntimeManager.PlayOneShotAttached(eventName, voicer, Volume_Sound);
+            RuntimeManager.PlayOneShotAttached(eventName, voicer);
         }
         else
         {
-            RuntimeManager.PlayOneShot(eventName, default, Volume_Sound);
+            RuntimeManager.PlayOneShot(eventName, default);
         }
     }
 
@@ -196,7 +196,7 @@ public class SoundManager
                 studioEvent.OverrideAttenuation = true;
                 studioEvent.OverrideMaxDistance = int.MaxValue;
                 studioEvent.OverrideMinDistance = int.MaxValue;
-                studioEvent.SetVolume(Volume_Music);
+                studioEvent.EventInstance.setVolume(Volume_Music);
             }
         }
         else
@@ -207,7 +207,7 @@ public class SoundManager
             studioEvent.OverrideAttenuation = true;
             studioEvent.OverrideMaxDistance = 20;
             studioEvent.OverrideMinDistance = 3;
-            studioEvent.SetVolume(Volume_Music);
+            studioEvent.EventInstance.setVolume(Volume_Music);
             if (!_3dstudioEventList.Contains(studioEvent))
                 _3dstudioEventList.Add(studioEvent);
         }
@@ -229,5 +229,4 @@ public class SoundManager
     {
         PlaySound("event:/" + scene_name[0]);
     }
-
 }

@@ -1,4 +1,3 @@
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +10,7 @@ using Component = UnityEngine.Component;
 using Object = UnityEngine.Object;
 using TMPro;
 using UnityEngine.Video;
+
 //Object并非C#基础中的Object，而是 UnityEngine.Object
 
 //自定义ReferenceCollector类在界面中的显示与功能
@@ -47,11 +47,7 @@ public class ReferenceCollectorEditor : Editor
         typeof(VideoPlayer),
     };
 
-    static Type[] sAllNoneComponentTypes =
-    {
-        typeof(Sprite),
-        typeof(Texture2D)
-    };
+    static Type[] sAllNoneComponentTypes = { typeof(Sprite), typeof(Texture2D) };
 
     Queue<GameObject> _objects = new Queue<GameObject>();
 
@@ -77,8 +73,16 @@ public class ReferenceCollectorEditor : Editor
         }
     }
 
-    public static Type[] SAllComponentTypes { get => sAllComponentTypes; set => sAllComponentTypes = value; }
-    public static Type[] SAllComponentTypes1 { get => sAllComponentTypes; set => sAllComponentTypes = value; }
+    public static Type[] SAllComponentTypes
+    {
+        get => sAllComponentTypes;
+        set => sAllComponentTypes = value;
+    }
+    public static Type[] SAllComponentTypes1
+    {
+        get => sAllComponentTypes;
+        set => sAllComponentTypes = value;
+    }
 
     public override void OnInspectorGUI()
     {
@@ -94,7 +98,10 @@ public class ReferenceCollectorEditor : Editor
         string buttonTitle = $"复制UI_AUTOCODE_RC ({pp})";
         if (GUILayout.Button(buttonTitle))
         {
-            string buf = "#region UI_AUTOCODE_RC " + this.referenceCollector.UUID.Replace("-", "") + "\n#endregion";
+            string buf =
+                "#region UI_AUTOCODE_RC "
+                + this.referenceCollector.UUID.Replace("-", "")
+                + "\n#endregion";
             EditorGUIUtility.systemCopyBuffer = buf;
             EditorUtility.DisplayDialog("内容", buf, "OK");
         }
@@ -158,12 +165,18 @@ public class ReferenceCollectorEditor : Editor
             if (sproperty != null)
             {
                 property = sproperty.FindPropertyRelative("key");
-                property.stringValue = EditorGUILayout.TextField(property.stringValue, GUILayout.Width(150));
-                property = this.dataProperty.GetArrayElementAtIndex(i).FindPropertyRelative("gameObject");
+                property.stringValue = EditorGUILayout.TextField(
+                    property.stringValue,
+                    GUILayout.Width(150)
+                );
+                property = this.dataProperty
+                    .GetArrayElementAtIndex(i)
+                    .FindPropertyRelative("gameObject");
                 property.objectReferenceValue = EditorGUILayout.ObjectField(
                     property.objectReferenceValue,
                     typeof(Object),
-                    true);
+                    true
+                );
                 this.TypePopup(i);
             }
 
@@ -212,7 +225,7 @@ public class ReferenceCollectorEditor : Editor
     public static void SyncUICode(ReferenceCollector rc, bool genCacheByRC = false)
     {
         string path;
-        if (SyncUICodeInDir(rc, "/Scripts/game/UI/", out path, genCacheByRC))//读取的根路径
+        if (SyncUICodeInDir(rc, "/Scripts/game/UI/", out path, genCacheByRC)) //读取的根路径
         {
             if (EditorUtility.DisplayDialog("同步成功", $"所在文件: {path}", "跳转", "知道了"))
             {
@@ -247,9 +260,11 @@ public class ReferenceCollectorEditor : Editor
         var uuid = $"{rc.UUID}".Replace("-", "");
         var templateCode = $"#region UI_AUTOCODE_RC {uuid}\n//...\n#endregion\n";
         EditorGUIUtility.systemCopyBuffer = templateCode;
-        EditorUtility.DisplayDialog($"没有找到对应的UI源文件：{uuid}",
-                                    $"请在对应的UI源文件类定义中，加入：\n\n{templateCode}\n这样的代码区段。“同步UI代码”会自动生成替换这个区域内的代码！\n\n（模板代码已经生成到系统剪贴板，在代码里CTRL-V即可。）",
-                                    "知道了");
+        EditorUtility.DisplayDialog(
+            $"没有找到对应的UI源文件：{uuid}",
+            $"请在对应的UI源文件类定义中，加入：\n\n{templateCode}\n这样的代码区段。“同步UI代码”会自动生成替换这个区域内的代码！\n\n（模板代码已经生成到系统剪贴板，在代码里CTRL-V即可。）",
+            "知道了"
+        );
     }
 
     void AddReference(SerializedProperty dataProperty, string key, Object obj)
@@ -280,10 +295,7 @@ public class ReferenceCollectorEditor : Editor
         }
 
         int selected = obj is GameObject ? 0 : -1;
-        var list = new List<string>
-        {
-            typeof(GameObject).Name
-        };
+        var list = new List<string> { typeof(GameObject).Name };
         for (int i = 0; i < sAllComponentTypes.Length; ++i)
         {
             if (go.GetComponent(sAllComponentTypes[i]) != null)
@@ -320,7 +332,9 @@ public class ReferenceCollectorEditor : Editor
         var dataProperty = this.serializedObject.FindProperty("data");
         for (int i = dataProperty.arraySize - 1; i >= 0; i--)
         {
-            var gameObjectProperty = dataProperty.GetArrayElementAtIndex(i).FindPropertyRelative("gameObject");
+            var gameObjectProperty = dataProperty
+                .GetArrayElementAtIndex(i)
+                .FindPropertyRelative("gameObject");
             if (gameObjectProperty.objectReferenceValue == null)
             {
                 dataProperty.DeleteArrayElementAtIndex(i);
@@ -387,7 +401,12 @@ public class ReferenceCollectorEditor : Editor
             strBuilder.Append("    this.");
             strBuilder.Append(data.key);
             strBuilder.Append(" = ");
-            strBuilder.Append(WrapUIControlWidget(data, "rc.GetReference<" + typeName + ">(" + Convert.ToString(i) + ")"));
+            strBuilder.Append(
+                WrapUIControlWidget(
+                    data,
+                    "rc.GetReference<" + typeName + ">(" + Convert.ToString(i) + ")"
+                )
+            );
             strBuilder.Append(";");
             strBuilder.Append(" // name: ");
             strBuilder.Append(data.gameObject.name);
@@ -467,9 +486,7 @@ public class ReferenceCollectorEditor : Editor
         //}
     }
 
-    void OnDataChange()
-    {
-    }
+    void OnDataChange() { }
 
     void OnEnable()
     {
@@ -477,7 +494,12 @@ public class ReferenceCollectorEditor : Editor
         this.referenceCollector = (ReferenceCollector)this.target;
     }
 
-    static bool FindUICodeInDir(ReferenceCollector rc, string uiRootDir, ref string path, out int line)
+    static bool FindUICodeInDir(
+        ReferenceCollector rc,
+        string uiRootDir,
+        ref string path,
+        out int line
+    )
     {
         var uuid = $"{rc.UUID}".Replace("-", "");
         string sig = $@"\s*#region\s+UI_AUTOCODE_RC {uuid}\s*";
@@ -490,20 +512,23 @@ public class ReferenceCollectorEditor : Editor
 
         if (foundPath.IsNullOrEmpty())
         {
-            FileHelper.WalkTree(root, ipath =>
-            {
-                if (ipath.EndsWith(".cs"))
+            FileHelper.WalkTree(
+                root,
+                ipath =>
                 {
-                    var codepath = root + ipath;
-                    if (FindUICodeLine(codepath, out foundLine))
+                    if (ipath.EndsWith(".cs"))
                     {
-                        foundPath = "Assets" + uiRootDir + ipath;
-                        found = true;
-                        return false;
+                        var codepath = root + ipath;
+                        if (FindUICodeLine(codepath, out foundLine))
+                        {
+                            foundPath = "Assets" + uiRootDir + ipath;
+                            found = true;
+                            return false;
+                        }
                     }
+                    return true;
                 }
-                return true;
-            });
+            );
         }
         else
         {
@@ -534,7 +559,12 @@ public class ReferenceCollectorEditor : Editor
         }
     }
 
-    static bool SyncUICodeInDir(ReferenceCollector rc, string uiRootDir, out string outPath, bool genCacheByRC)
+    static bool SyncUICodeInDir(
+        ReferenceCollector rc,
+        string uiRootDir,
+        out string outPath,
+        bool genCacheByRC
+    )
     {
         var uuid = $"{rc.UUID}".Replace("-", "");
         string sig = $@"\s*#region\s+UI_AUTOCODE_RC {uuid}\s*\n";
@@ -542,42 +572,49 @@ public class ReferenceCollectorEditor : Editor
         bool found = false;
         string foundPath = "";
 
-        FileHelper.WalkTree(root, path =>
-        {
-            if (path.EndsWith(".cs"))
+        FileHelper.WalkTree(
+            root,
+            path =>
             {
-                var codepath = root + "/" + path;
-                var code = File.ReadAllText(codepath);
-                var m = Regex.Match(code, sig);
-                if (m.Success)
+                if (path.EndsWith(".cs"))
                 {
-                    Inject(codepath, code);
-                    found = true;
-                    foundPath = "Assets" + uiRootDir + path;
-                    return false; // stop walk
+                    var codepath = root + "/" + path;
+                    var code = File.ReadAllText(codepath);
+                    var m = Regex.Match(code, sig);
+                    if (m.Success)
+                    {
+                        Inject(codepath, code);
+                        found = true;
+                        foundPath = "Assets" + uiRootDir + path;
+                        return false; // stop walk
+                    }
                 }
+                return true;
             }
-            return true;
-        });
+        );
 
         outPath = foundPath;
         return found;
 
         void Inject(string codepath, string code)
         {
-            string pat = $@"\n\s*#region\s+UI_AUTOCODE_RC {uuid}\s*\n(?<autocode>.*?)\s*#endregion\s*\n";
+            string pat =
+                $@"\n\s*#region\s+UI_AUTOCODE_RC {uuid}\s*\n(?<autocode>.*?)\s*#endregion\s*\n";
             var re = new Regex(pat, RegexOptions.Singleline);
 
-            var newcode = re.Replace(code, m =>
-            {
-                string str = m.Groups[0].Value;
-                int i = StringHelper.FindByPredicate(str, c => c != '\n' && c != '\r');
-                int j = StringHelper.FindByPredicate(str, c => !char.IsWhiteSpace(c));
-                string indent = new string(' ', j - i);
-                var _autocode = GenRCAutoCode(rc, genCacheByRC);
-                var autocode = _autocode.Replace("@@", indent);
-                return $"\n\n{indent}#region UI_AUTOCODE_RC {uuid}\n{autocode}\n{indent}#endregion\n\n";
-            });
+            var newcode = re.Replace(
+                code,
+                m =>
+                {
+                    string str = m.Groups[0].Value;
+                    int i = StringHelper.FindByPredicate(str, c => c != '\n' && c != '\r');
+                    int j = StringHelper.FindByPredicate(str, c => !char.IsWhiteSpace(c));
+                    string indent = new string(' ', j - i);
+                    var _autocode = GenRCAutoCode(rc, genCacheByRC);
+                    var autocode = _autocode.Replace("@@", indent);
+                    return $"\n\n{indent}#region UI_AUTOCODE_RC {uuid}\n{autocode}\n{indent}#endregion\n\n";
+                }
+            );
 
             File.WriteAllText(codepath, newcode);
         }

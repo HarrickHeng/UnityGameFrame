@@ -13,9 +13,9 @@ public class MyImage : Image
     [SerializeField]
     public Color _color = Color.white;
     [SerializeField]
-    public bool m_x_reversal =false;//x轴翻转
+    public bool m_x_reversal =false; //x轴翻转
     [SerializeField]
-    public bool m_y_reversal = false;//y轴翻转
+    public bool m_y_reversal = false; //y轴翻转
     [SerializeField]
     public float _scale = 1f;
     public bool IsFade { get => isFade; set { isFade = value; OnInit(); }  }

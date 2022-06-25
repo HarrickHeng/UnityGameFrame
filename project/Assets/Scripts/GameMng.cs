@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class GameMng : MonoSingleton<GameMng>
 {
-    private void Start()
+    public void Start()
     {
         //开始游戏
         LogicLoaderManager.Instance.StartGame();

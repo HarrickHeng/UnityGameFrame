@@ -60,11 +60,17 @@ namespace FMODUnity
             PlatformIOS.StaticLoadPlugins(this, coreSystem, reportResult);
         }
 #elif UNITY_ANDROID
+        public override string GetBankFolder()
+        {
+            return PlatformAndroid.StaticGetBankFolder();
+        }
+
         public override string GetPluginPath(string pluginName)
         {
             return PlatformAndroid.StaticGetPluginPath(pluginName);
         }
 #endif
+
 #if UNITY_EDITOR
         public override OutputType[] ValidOutputTypes { get { return null; } }
 #endif

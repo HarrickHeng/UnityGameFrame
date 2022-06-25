@@ -3,11 +3,8 @@ using UnityEngine;
 
 public static class ReferenceCollectorHelper
 {
-
-
     public static void CacheReferenceHandle(object target)
     {
-
         var type = target.GetType();
         var method = type.GetMethod("CacheReference", BindingFlags.Instance | BindingFlags.Public);
         try
@@ -20,6 +17,4 @@ public static class ReferenceCollectorHelper
             Debug.LogError($"{type.FullName}.CacheReference: {e.Message}: \n{e.StackTrace}");
         }
     }
-
-
 }

@@ -7,14 +7,11 @@ using Cysharp.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-
 public class MainScene : SceneBehavior
 {
     GameObject voicer;
-    public MainScene(Scene _scene) : base(_scene)
-    {
 
-    }
+    public MainScene(Scene _scene) : base(_scene) { }
 
     public override async UniTask EnterScene(LoadItem item, Action UpdateLoading)
     {
@@ -53,6 +50,4 @@ public class MainScene : SceneBehavior
     {
         Debug.Log("LeaveScene--MainScene");
     }
-
 }
-

@@ -58,9 +58,22 @@ namespace FMODUnity
                 yield return string.Format("android/{0}/libfmodstudio{1}.so", architecture, suffix);
             }
         }
+
+        public override bool SupportsAdditionalCPP(BuildTarget target)
+        {
+            // Unity parses --additional-cpp arguments specified via
+            // PlayerSettings.SetAdditionalIl2CppArgs() incorrectly when the Android
+            // Export Project option is set.
+            return false;
+        }
 #endif
 
         public override string GetBankFolder()
+        {
+            return StaticGetBankFolder();
+        }
+
+        public static string StaticGetBankFolder()
         {
             return Settings.Instance.AndroidUseOBB ? Application.streamingAssetsPath : "file:///android_asset";
         }
