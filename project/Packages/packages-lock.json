@@ -1,7 +1,7 @@
 {
   "dependencies": {
     "com.cysharp.unitask": {
-      "version": "file:G:/workspace/Unity3d/gamejam2022-6/local_package/com.cysharp.unitask@50a67d8f41",
+      "version": "file:E:/CodeProject/Unity_DEMO/UnityGameFrame/local_package/com.cysharp.unitask@50a67d8f41",
       "depth": 0,
       "source": "local",
       "dependencies": {}
