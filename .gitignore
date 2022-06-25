@@ -4,3 +4,4 @@
 /project/obj
 /project/*.csproj
 /project/*.log
+/project/*.sln
