@@ -5,3 +5,4 @@
 /project/*.csproj
 /project/*.log
 /project/*.sln
+/project/UserSettings
