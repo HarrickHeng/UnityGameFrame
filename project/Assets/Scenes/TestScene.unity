@@ -4384,6 +4384,7 @@ GameObject:
   - component: {fileID: 1885617380}
   - component: {fileID: 1885617379}
   - component: {fileID: 1885617382}
+  - component: {fileID: 1885617383}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -4477,6 +4478,18 @@ MonoBehaviour:
   m_CropFrameX: 0
   m_CropFrameY: 0
   m_StretchFill: 0
+--- !u!114 &1885617383
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1885617378}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ecc1b0d2a94949140b32be806f13da62, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1886090662
 GameObject:
   m_ObjectHideFlags: 0
@@ -4594,6 +4607,7 @@ GameObject:
   - component: {fileID: 1936069631}
   - component: {fileID: 1936069630}
   - component: {fileID: 1936069633}
+  - component: {fileID: 1936069634}
   m_Layer: 3
   m_Name: Heshang
   m_TagString: Player
@@ -4700,6 +4714,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 08e7537517263b94d9a7ebea0163623f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &1936069634
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1936069629}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60a0afb1b0ded834bb919f0af2513852, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  openGhoseEffect: 1
+  openFade: 1
+  durationTime: 0.7
+  spawnTimeval: 0.2
+  ghostColor: {r: 0, g: 0, b: 0, a: 1}
+  ghostSortingOrder: -1
 --- !u!1 &2051533615
 GameObject:
   m_ObjectHideFlags: 0

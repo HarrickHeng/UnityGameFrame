@@ -40,6 +40,10 @@ namespace GameCore.Animation
         {
             coll = GetComponent<Collision>();
             rb = GetComponent<Rigidbody2D>();
+            CDMgr.instance.AddCD("downSkill", 5.0f); //遁地冷却时间
+            CDMgr.instance.AddCD("downSkill_Buff", 3.0f); //遁地持续时间
+            CDMgr.instance.AddCD("skill01", 2.0f);
+            CDMgr.instance.AddCD("skill02", 3.0f);
         }
 
         void Awake()
@@ -68,12 +72,17 @@ namespace GameCore.Animation
             if (
                 (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
                 && coll.onGround
+                && CDMgr.instance.IsReady("downSkill")
             )
             {
-                Down();
+                OnDownSkill();
+            }
+            if (CDMgr.instance.IsReady("downSkill_Buff"))
+            {
+                OffDownSkill();
             }
 
-            if (Input.GetButtonDown("Fire1"))
+            if (Input.GetButtonDown("Fire1") && CDMgr.instance.IsReady("skill01"))
             {
                 var state = graph.Play(attack01Clip);
                 state.OnEnd = () =>
@@ -82,7 +91,7 @@ namespace GameCore.Animation
                 };
             }
 
-            if (Input.GetButtonDown("Fire2"))
+            if (Input.GetButtonDown("Fire2") && CDMgr.instance.IsReady("skill02"))
             {
                 var state = graph.Play(attack02Clip);
                 state.OnEnd = () =>
@@ -122,11 +131,7 @@ namespace GameCore.Animation
         {
             if (isDowned)
             {
-                gameObject.FindChild("Heshang").SetActive(true);
-                gameObject.FindChild("ArrowDown").SetActive(false);
-                gameObject.GetComponent<CapsuleCollider2D>().isTrigger = false;
-                rb.isKinematic = false;
-                isDowned = false;
+                OffDownSkill();
             }
             else
             {
@@ -140,8 +145,6 @@ namespace GameCore.Animation
             SpriteRenderer spr = gameObject.FindChild("Heshang").GetComponent<SpriteRenderer>();
             spr.flipX = side < 0;
         }
-
-        private Vector2 lastPos;
 
         private void Walk(Vector2 dir)
         {
@@ -171,13 +174,22 @@ namespace GameCore.Animation
 
         private bool isDowned = false;
 
-        private void Down()
+        private void OnDownSkill()
         {
-            isDowned = true;
             gameObject.FindChild("Heshang").SetActive(false);
             gameObject.FindChild("ArrowDown").SetActive(true);
             gameObject.GetComponent<CapsuleCollider2D>().isTrigger = true;
             rb.isKinematic = true;
+            isDowned = true;
+        }
+
+        private void OffDownSkill()
+        {
+            gameObject.FindChild("Heshang").SetActive(true);
+            gameObject.FindChild("ArrowDown").SetActive(false);
+            gameObject.GetComponent<CapsuleCollider2D>().isTrigger = false;
+            rb.isKinematic = false;
+            isDowned = false;
         }
 
         void GroundTouch()
