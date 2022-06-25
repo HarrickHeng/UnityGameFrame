@@ -6,7 +6,7 @@ public class Collision : MonoBehaviour
 {
     [Header("Layers")]
     public LayerMask groundLayer;
-    public LayerMask playerLayer;
+    public LayerMask attackLayer;
 
     [Space]
     public bool onGround;
@@ -67,24 +67,24 @@ public class Collision : MonoBehaviour
         otherColL = Physics2D.OverlapCircle(
             (Vector2)transform.position + leftOffset,
             collisionRadius,
-            playerLayer
+            attackLayer
         );
         otherColR = Physics2D.OverlapCircle(
             (Vector2)transform.position + rightOffset,
             collisionRadius,
-            playerLayer
+            attackLayer
         );
 
         //skill02
         otherCol2L = Physics2D.OverlapCircle(
             (Vector2)transform.position + leftOffset2,
             collisionRadius2,
-            playerLayer
+            attackLayer
         );
         otherCol2R = Physics2D.OverlapCircle(
             (Vector2)transform.position + rightOffset2,
             collisionRadius2,
-            playerLayer
+            attackLayer
         );
 
         if (CheckIsSelf(otherColL))

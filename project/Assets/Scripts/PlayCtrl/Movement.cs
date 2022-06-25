@@ -15,13 +15,10 @@ namespace GameCore.Animation
         public AnimationClip jumpBackClip;
         public AnimationClip attack01Clip;
         public AnimationClip attack02Clip;
-        public AnimationClip beHitClip;
         public AnimationClip deadClip;
-        public CircleEffect circleEffect;
         private AnimGraph graph;
         private GameObject heshang;
         private GameObject arrowDown;
-
 
         [HideInInspector]
         public Rigidbody2D rb;
@@ -110,7 +107,11 @@ namespace GameCore.Animation
 
             if (coll.onBeHit)
             {
-                graph.Play(beHitClip);
+                Material mat = new Material(Shader.Find("Custom/BossMouseShader"));
+                mat.SetTexture(
+                    "BossMouseShader",
+                    Resources.Load("/Shaders/BossMouseShader") as Texture2D
+                );
                 coll.onBeHit = false;
             }
 
@@ -143,25 +144,21 @@ namespace GameCore.Animation
 
             if (Input.GetButtonDown("Fire1") && CDMgr.instance.IsReady("skill01"))
             {
-                circleEffect.SetEffect(0.53f,1f);
                 var state = graph.Play(attack01Clip);
                 state.OnEnd = () =>
                 {
                     graph.CrossFade(idleClip);
                     Attack(1);
-                    circleEffect.ClearEffect();
                 };
             }
 
             if (Input.GetButtonDown("Fire2") && CDMgr.instance.IsReady("skill02"))
             {
-                circleEffect.SetEffect(0.66f, 1.39f);
                 var state = graph.Play(attack02Clip);
                 state.OnEnd = () =>
                 {
                     graph.CrossFade(idleClip);
                     Attack(2);
-                    circleEffect.ClearEffect();
                 };
             }
 
@@ -283,6 +280,7 @@ namespace GameCore.Animation
         private async UniTask BackSkill()
         {
             heshang.GetComponent<GhostEffect>().openGhoseEffect = true;
+            rb.velocity = new Vector2(0, 0);
             rb.AddForce(new Vector2(-side, 0.38f) * backForce);
             graph.CrossFade(jumpBackClip);
             await UniTask.Delay(300);

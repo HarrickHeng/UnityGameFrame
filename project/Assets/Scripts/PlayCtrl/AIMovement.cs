@@ -15,7 +15,6 @@ namespace GameCore.Animation
         public AnimationClip jumpBackClip;
         public AnimationClip attack01Clip;
         public AnimationClip attack02Clip;
-        public AnimationClip beHitClip;
         public AnimationClip deadClip;
         private AnimGraph graph;
         private GameObject heshang;
@@ -102,7 +101,12 @@ namespace GameCore.Animation
 
             if (coll.onBeHit)
             {
-                graph.Play(beHitClip);
+                Material mat = new Material(Shader.Find("Custom/BossMouseShader"));
+                mat.SetTexture(
+                    "BossMouseShader",
+                    Resources.Load("/Shaders/BossMouseShader") as Texture2D
+                );
+                heshang.GetComponent<SpriteRenderer>().material = mat;
                 coll.onBeHit = false;
             }
 
