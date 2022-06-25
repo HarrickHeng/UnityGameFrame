@@ -215,13 +215,24 @@ MonoBehaviour:
     m_Bits: 512
   playerLayer:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 64
   onGround: 0
+  bottomOffset: {x: 0, y: -0.14}
   onOther: 0
   collisionRadius: 0.02
-  bottomOffset: {x: 0, y: -0.14}
   rightOffset: {x: 0.09, y: 0}
   leftOffset: {x: -0.09, y: 0}
+  otherColL: {fileID: 0}
+  otherColR: {fileID: 0}
+  collisionRadius2: 0.02
+  rightOffset2: {x: 0.24, y: 0}
+  leftOffset2: {x: -0.24, y: 0}
+  otherCol2L: {fileID: 0}
+  otherCol2R: {fileID: 0}
+  hp: 100
+  skill01_atk: 10
+  skill02_atk: 10
+  onBeHit: 0
 --- !u!114 &94003129
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -238,15 +249,22 @@ MonoBehaviour:
   idleClip: {fileID: 7400000, guid: b33df89fa261880488e5c3db45cfa196, type: 2}
   runClip: {fileID: 7400000, guid: 5a3ccc91fda23534aba26d7bf5937742, type: 2}
   jumpClip: {fileID: 7400000, guid: 70180bbb4da6aac4581530281260d03c, type: 2}
+  jumpBackClip: {fileID: 7400000, guid: 5c5b0d18dfd1c7d46b2441e742a1a82d, type: 2}
   attack01Clip: {fileID: 7400000, guid: 64f50f89a77f91f42a562b220596f1cc, type: 2}
   attack02Clip: {fileID: 7400000, guid: ef3e5e885897fb440bbf80a0b5c5b0fc, type: 2}
+  beHitClip: {fileID: 7400000, guid: 5c5b0d18dfd1c7d46b2441e742a1a82d, type: 2}
+  deadClip: {fileID: 7400000, guid: f9b6b1fe32d5ac24d839db81875b2a9f, type: 2}
   rb: {fileID: 0}
   speed: 3
   jumpForce: 6
+  backForce: 500
   slideSpeed: 1
-  dashSpeed: 20
   canMove: 1
-  isDashing: 0
+  downSkill_CD: 5
+  skill01_CD: 5
+  skill02_CD: 5
+  backSkill_CD: 2
+  downSkill_Buff: 2
   side: 1
 --- !u!114 &94003130
 MonoBehaviour:
@@ -274,7 +292,8 @@ GameObject:
   - component: {fileID: 323266268}
   - component: {fileID: 323266267}
   - component: {fileID: 323266266}
-  m_Layer: 3
+  - component: {fileID: 323266270}
+  m_Layer: 6
   m_Name: Enemy
   m_TagString: Player
   m_Icon: {fileID: 0}
@@ -298,13 +317,24 @@ MonoBehaviour:
     m_Bits: 512
   playerLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 8
   onGround: 0
+  bottomOffset: {x: 0, y: -0.14}
   onOther: 0
   collisionRadius: 0.02
-  bottomOffset: {x: 0, y: -0.14}
   rightOffset: {x: 0.09, y: 0}
   leftOffset: {x: -0.09, y: 0}
+  otherColL: {fileID: 0}
+  otherColR: {fileID: 0}
+  collisionRadius2: 0.02
+  rightOffset2: {x: 0.24, y: 0}
+  leftOffset2: {x: -0.24, y: 0}
+  otherCol2L: {fileID: 0}
+  otherCol2R: {fileID: 0}
+  hp: 100
+  skill01_atk: 10
+  skill02_atk: 10
+  onBeHit: 0
 --- !u!70 &323266267
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -358,6 +388,40 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 1
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &323266270
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 323266265}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 47582ec65f11e2e4cb41273ac71af437, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  animComponent: {fileID: 1886090666}
+  idleClip: {fileID: 7400000, guid: b33df89fa261880488e5c3db45cfa196, type: 2}
+  runClip: {fileID: 7400000, guid: 5a3ccc91fda23534aba26d7bf5937742, type: 2}
+  jumpClip: {fileID: 7400000, guid: fd0e5f456aec3b0459ec3865b451bbcf, type: 2}
+  jumpBackClip: {fileID: 7400000, guid: 5c5b0d18dfd1c7d46b2441e742a1a82d, type: 2}
+  attack01Clip: {fileID: 7400000, guid: 64f50f89a77f91f42a562b220596f1cc, type: 2}
+  attack02Clip: {fileID: 7400000, guid: ef3e5e885897fb440bbf80a0b5c5b0fc, type: 2}
+  beHitClip: {fileID: 7400000, guid: 5c5b0d18dfd1c7d46b2441e742a1a82d, type: 2}
+  deadClip: {fileID: 7400000, guid: f9b6b1fe32d5ac24d839db81875b2a9f, type: 2}
+  rb: {fileID: 0}
+  CurrentState: 0
+  speed: 10
+  jumpForce: 50
+  backForce: 50
+  slideSpeed: 5
+  canMove: 1
+  downSkill_CD: 5
+  skill01_CD: 5
+  skill02_CD: 5
+  backSkill_CD: 2
+  downSkill_Buff: 2
+  side: 1
 --- !u!1 &346708334
 GameObject:
   m_ObjectHideFlags: 0
@@ -4501,8 +4565,9 @@ GameObject:
   - component: {fileID: 1886090663}
   - component: {fileID: 1886090665}
   - component: {fileID: 1886090664}
-  m_Layer: 3
-  m_Name: Heshang
+  - component: {fileID: 1886090666}
+  m_Layer: 6
+  m_Name: HeshangE
   m_TagString: Player
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4595,6 +4660,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &1886090666
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1886090662}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08e7537517263b94d9a7ebea0163623f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1936069629
 GameObject:
   m_ObjectHideFlags: 0
@@ -4726,10 +4803,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 60a0afb1b0ded834bb919f0af2513852, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  openGhoseEffect: 1
+  openGhoseEffect: 0
   openFade: 1
-  durationTime: 0.7
-  spawnTimeval: 0.2
+  durationTime: 0.3
+  spawnTimeval: 0
   ghostColor: {r: 0, g: 0, b: 0, a: 1}
   ghostSortingOrder: -1
 --- !u!1 &2051533615

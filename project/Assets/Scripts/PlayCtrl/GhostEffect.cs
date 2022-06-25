@@ -36,6 +36,10 @@ public class GhostEffect : MonoBehaviour
     {
         if (openGhoseEffect == false)
         {
+            if (ghostList.Count > 0)
+            {
+                Fade();
+            }
             return;
         }
 

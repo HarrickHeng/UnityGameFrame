@@ -5,7 +5,7 @@ using Cysharp.Threading.Tasks;
 
 namespace GameCore.Animation
 {
-    public class Movement : MonoBehaviour
+    public class AIMovement : MonoBehaviour
     {
         private Collision coll;
         public AnimComponent animComponent;
@@ -19,10 +19,11 @@ namespace GameCore.Animation
         public AnimationClip deadClip;
         private AnimGraph graph;
         private GameObject heshang;
-        private GameObject arrowDown;
 
         [HideInInspector]
         public Rigidbody2D rb;
+
+        public EAIState CurrentState = EAIState.Ilde;
 
         [Space]
         [Header("Stats")]
@@ -34,9 +35,6 @@ namespace GameCore.Animation
         [Space]
         [Header("Booleans")]
         public bool canMove;
-
-        [Space]
-        private bool groundTouch;
 
         [Header("技能冷却时间")]
         public float downSkill_CD = 5.0f;
@@ -51,15 +49,11 @@ namespace GameCore.Animation
 
         void Start()
         {
-            heshang = gameObject.FindChild("Heshang");
-            arrowDown = gameObject.FindChild("ArrowDown");
+            heshang = gameObject.FindChild("HeshangE");
             coll = GetComponent<Collision>();
             rb = GetComponent<Rigidbody2D>();
-            CDMgr.instance.AddCD("downSkill", downSkill_CD); //遁地冷却时间
-            CDMgr.instance.AddCD("downSkill_Buff", downSkill_Buff); //遁地持续时间
-            CDMgr.instance.AddCD("skill01", skill01_CD);
-            CDMgr.instance.AddCD("skill02", skill02_CD);
-            CDMgr.instance.AddCD("backSkill", backSkill_CD);
+            CDMgr.instance.AddCD("skill01" + gameObject.GetHashCode(), skill01_CD);
+            CDMgr.instance.AddCD("skill02" + gameObject.GetHashCode(), skill02_CD);
         }
 
         void Awake()
@@ -112,96 +106,73 @@ namespace GameCore.Animation
                 coll.onBeHit = false;
             }
 
-            float x = Input.GetAxis("Horizontal");
-            float y = Input.GetAxis("Vertical");
-
-            Vector2 dir = new Vector2(x, y);
-            Walk(dir);
-
             rb.gravityScale = 3;
 
-            if (coll.onGround && !groundTouch)
+            switch (CurrentState)
             {
-                GroundTouch();
-                groundTouch = true;
-            }
-
-            if (
-                (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
-                && coll.onGround
-                && CDMgr.instance.IsReady("downSkill")
-            )
-            {
-                OnDownSkill();
-            }
-            if (CDMgr.instance.IsReady("downSkill_Buff"))
-            {
-                OffDownSkill();
-            }
-
-            if (Input.GetButtonDown("Fire1") && CDMgr.instance.IsReady("skill01"))
-            {
-                var state = graph.Play(attack01Clip);
-                state.OnEnd = () =>
-                {
+                case EAIState.Ilde:
                     graph.CrossFade(idleClip);
-                    Attack(1);
-                };
+                    rb.velocity = Vector2.zero;
+                    if (coll.onOther)
+                    {
+                        CurrentState = EAIState.Attack;
+                    }
+                    break;
+                case EAIState.Attack:
+                    rb.velocity = Vector2.zero;
+                    if (!IsPlaying(attack01Clip) && !IsPlaying(attack02Clip))
+                    {
+                        if (CDMgr.instance.IsReady("skill01" + gameObject.GetHashCode()))
+                        {
+                            var state = graph.Play(attack01Clip);
+                            state.OnEnd = () =>
+                            {
+                                graph.CrossFade(idleClip);
+                                Attack(1);
+                            };
+                        }
+
+                        if (CDMgr.instance.IsReady("skill02" + gameObject.GetHashCode()))
+                        {
+                            var state = graph.Play(attack02Clip);
+                            state.OnEnd = () =>
+                            {
+                                graph.CrossFade(idleClip);
+                                Attack(2);
+                            };
+                        }
+                    }
+
+                    if (!coll.onOther)
+                    {
+                        CurrentState = EAIState.Move;
+                    }
+                    break;
+                case EAIState.Move:
+                    break;
             }
 
-            if (Input.GetButtonDown("Fire2") && CDMgr.instance.IsReady("skill02"))
-            {
-                var state = graph.Play(attack02Clip);
-                state.OnEnd = () =>
-                {
-                    graph.CrossFade(idleClip);
-                    Attack(2);
-                };
-            }
+            // Walk(dir);
 
-            if (Input.GetButtonDown("Fire3") && CDMgr.instance.IsReady("backSkill"))
-            {
-                await BackSkill();
-            }
+            // if (!canMove)
+            //     return;
 
-            if (Input.GetButtonDown("Jump"))
-            {
-                graph.CrossFade(jumpClip);
-                if (coll.onGround)
-                    Jump(Vector2.up, false);
-            }
-
-            if (!coll.onGround && groundTouch)
-            {
-                groundTouch = false;
-            }
-
-            if (!canMove)
-                return;
-
-            if (x > 0)
-            {
-                side = 1;
-                ChangeFlip(side);
-            }
-            if (x < 0)
-            {
-                side = -1;
-                ChangeFlip(side);
-            }
+            // if (x > 0)
+            // {
+            //     side = 1;
+            //     ChangeFlip(side);
+            // }
+            // if (x < 0)
+            // {
+            //     side = -1;
+            //     ChangeFlip(side);
+            // }
         }
 
         private void Jump(Vector2 dir, bool wall)
         {
-            if (isDowned)
-            {
-                OffDownSkill();
-            }
-            else
-            {
-                rb.velocity = new Vector2(rb.velocity.x, 0);
-                rb.velocity += dir * jumpForce;
-            }
+            rb.velocity = new Vector2(rb.velocity.x, 0);
+            rb.velocity += dir * jumpForce;
         }
 
         private void ChangeFlip(int side)
@@ -243,27 +214,6 @@ namespace GameCore.Animation
                 state.Time = 0;
         }
 
-        private bool isDowned = false;
-
-        //遁地技能
-        private void OnDownSkill()
-        {
-            heshang.SetActive(false);
-            arrowDown.SetActive(true);
-            gameObject.GetComponent<CapsuleCollider2D>().isTrigger = true;
-            rb.isKinematic = true;
-            isDowned = true;
-        }
-
-        private void OffDownSkill()
-        {
-            heshang.SetActive(true);
-            arrowDown.SetActive(false);
-            gameObject.GetComponent<CapsuleCollider2D>().isTrigger = false;
-            rb.isKinematic = false;
-            isDowned = false;
-        }
-
         private void Dead()
         {
             var state = graph.CrossFade(deadClip);
@@ -282,10 +232,12 @@ namespace GameCore.Animation
             await UniTask.Delay(300);
             heshang.GetComponent<GhostEffect>().openGhoseEffect = false;
         }
-
-        void GroundTouch()
-        {
-            side = heshang.GetComponent<SpriteRenderer>().flipX ? -1 : 1;
-        }
     }
+}
+
+public enum EAIState
+{
+    Ilde,
+    Attack,
+    Move
 }
