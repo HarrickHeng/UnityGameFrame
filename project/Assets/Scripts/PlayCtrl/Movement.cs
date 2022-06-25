@@ -2,102 +2,189 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Movement : MonoBehaviour
+namespace GameCore.Animation
 {
-    private Collision coll;
-
-    [HideInInspector]
-    public Rigidbody2D rb;
-
-    [Space]
-    [Header("Stats")]
-    public float speed = 10;
-    public float jumpForce = 50;
-    public float slideSpeed = 5;
-    public float dashSpeed = 20;
-
-    [Space]
-    [Header("Booleans")]
-    public bool canMove;
-    public bool isDashing;
-
-    [Space]
-    private bool groundTouch;
-    private bool hasDashed;
-
-    public int side = 1;
-
-    void Start()
+    public class Movement : MonoBehaviour
     {
-        coll = GetComponent<Collision>();
-        rb = GetComponent<Rigidbody2D>();
-    }
+        private Collision coll;
+        public AnimComponent animComponent;
+        public AnimationClip idleClip;
+        public AnimationClip runClip;
+        public AnimationClip jumpClip;
+        public AnimationClip attack01Clip;
+        public AnimationClip attack02Clip;
+        private AnimGraph graph;
 
-    void Update()
-    {
-        float x = Input.GetAxis("Horizontal");
-        float y = Input.GetAxis("Vertical");
-        float xRaw = Input.GetAxisRaw("Horizontal");
-        float yRaw = Input.GetAxisRaw("Vertical");
-        Vector2 dir = new Vector2(x, y);
+        [HideInInspector]
+        public Rigidbody2D rb;
 
-        Walk(dir);
+        [Space]
+        [Header("Stats")]
+        public float speed = 10;
+        public float jumpForce = 50;
+        public float slideSpeed = 5;
+        public float dashSpeed = 20;
 
-        rb.gravityScale = 3;
+        [Space]
+        [Header("Booleans")]
+        public bool canMove;
+        public bool isDashing;
 
-        if (coll.onGround && !groundTouch)
+        [Space]
+        private bool groundTouch;
+        private bool hasDashed;
+
+        public int side = 1;
+
+        void Start()
         {
-            GroundTouch();
-            groundTouch = true;
+            coll = GetComponent<Collision>();
+            rb = GetComponent<Rigidbody2D>();
         }
 
-        if (Input.GetButtonDown("Jump"))
+        void Awake()
         {
-            // anim.SetTrigger("jump");
-            if (coll.onGround)
-                Jump(Vector2.up, false);
+            graph = animComponent.GetGraph();
+            graph.Play(idleClip);
         }
 
-        if (!coll.onGround && groundTouch)
+        void Update()
         {
-            groundTouch = false;
+            float x = Input.GetAxis("Horizontal");
+            float y = Input.GetAxis("Vertical");
+
+            Vector2 dir = new Vector2(x, y);
+
+            Walk(dir);
+
+            rb.gravityScale = 3;
+
+            if (coll.onGround && !groundTouch)
+            {
+                GroundTouch();
+                groundTouch = true;
+            }
+
+            if (
+                (Input.GetKeyDown(KeyCode.S) || Input.GetKeyDown(KeyCode.DownArrow))
+                && coll.onGround
+            )
+            {
+                Down();
+            }
+
+            if (Input.GetButtonDown("Fire1"))
+            {
+                var state = graph.Play(attack01Clip);
+                state.OnEnd = () =>
+                {
+                    graph.CrossFade(idleClip);
+                };
+            }
+
+            if (Input.GetButtonDown("Fire2"))
+            {
+                var state = graph.Play(attack02Clip);
+                state.OnEnd = () =>
+                {
+                    graph.CrossFade(idleClip);
+                };
+            }
+
+            if (Input.GetButtonDown("Jump"))
+            {
+                graph.CrossFade(jumpClip);
+                if (coll.onGround)
+                    Jump(Vector2.up, false);
+            }
+
+            if (!coll.onGround && groundTouch)
+            {
+                groundTouch = false;
+            }
+
+            if (!canMove)
+                return;
+
+            if (x > 0)
+            {
+                side = 1;
+                ChangeFlip(side);
+            }
+            if (x < 0)
+            {
+                side = -1;
+                ChangeFlip(side);
+            }
         }
 
-        if (!canMove)
-            return;
-
-        if (x > 0)
+        private void Jump(Vector2 dir, bool wall)
         {
-            side = 1;
-            // anim.Flip(side);
+            if (isDowned)
+            {
+                gameObject.FindChild("Heshang").SetActive(true);
+                gameObject.FindChild("ArrowDown").SetActive(false);
+                gameObject.GetComponent<CapsuleCollider2D>().isTrigger = false;
+                rb.isKinematic = false;
+                isDowned = false;
+            }
+            else
+            {
+                rb.velocity = new Vector2(rb.velocity.x, 0);
+                rb.velocity += dir * jumpForce;
+            }
         }
-        if (x < 0)
+
+        private void ChangeFlip(int side)
         {
-            side = -1;
-            // anim.Flip(side);
+            SpriteRenderer spr = gameObject.FindChild("Heshang").GetComponent<SpriteRenderer>();
+            spr.flipX = side < 0;
         }
-    }
 
-    private void Jump(Vector2 dir, bool wall)
-    {
+        private Vector2 lastPos;
 
-        rb.velocity = new Vector2(rb.velocity.x, 0);
-        rb.velocity += dir * jumpForce;
-    }
+        private void Walk(Vector2 dir)
+        {
+            if (!canMove)
+                return;
+            if (IsPlaying(attack01Clip) || IsPlaying(attack02Clip))
+            {
+                return;
+            }
 
-    private void Walk(Vector2 dir)
-    {
-        if (!canMove)
-            return;
+            rb.velocity = new Vector2(dir.x * speed, rb.velocity.y);
+            if (rb.velocity.magnitude <= 0.02f)
+            {
+                graph.CrossFade(idleClip);
+            }
+            else
+            {
+                graph.CrossFade(runClip);
+            }
+        }
 
-        rb.velocity = new Vector2(dir.x * speed, rb.velocity.y);
-    }
+        private bool IsPlaying(AnimationClip clip)
+        {
+            var state = graph.GetState(clip);
+            return state != null && state.IsPlaying;
+        }
 
-    void GroundTouch()
-    {
-        hasDashed = false;
-        isDashing = false;
+        private bool isDowned = false;
 
-        // side = anim.sr.flipX ? -1 : 1;
+        private void Down()
+        {
+            isDowned = true;
+            gameObject.FindChild("Heshang").SetActive(false);
+            gameObject.FindChild("ArrowDown").SetActive(true);
+            gameObject.GetComponent<CapsuleCollider2D>().isTrigger = true;
+            rb.isKinematic = true;
+        }
+
+        void GroundTouch()
+        {
+            hasDashed = false;
+            isDashing = false;
+            side = gameObject.FindChild("Heshang").GetComponent<SpriteRenderer>().flipX ? -1 : 1;
+        }
     }
 }
