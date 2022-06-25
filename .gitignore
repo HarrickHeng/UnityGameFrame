@@ -2,3 +2,5 @@
 /project/Temp
 /project/Logs
 /project/obj
+/project/*.csproj
+/project/*.log
